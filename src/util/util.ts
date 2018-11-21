@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import * as _ from 'lodash';
-import * as fs from 'fs';
 
 // escapeAssertion escapes the dots in the assertion,
 // because the expression evaluation doesn't support such variable names.
@@ -59,30 +58,6 @@ function setEquals(a: string[], b: string[]): boolean {
   return _.isEqual(_.sortedUniq(a), _.sortedUniq(b));
 }
 
-// readFile return a promise for readFile.
-function readFile(path: string, encoding?: string): any {
-  return new Promise((resolve, reject) => {
-    fs.readFile(path, encoding || 'utf8', (error, data) => {
-      if (error) {
-        reject(error);
-      }
-      resolve(data);
-    });
-  });
-}
-
-// writeFile return a promise for writeFile.
-function writeFile(path: string, file: string, encoding?: string): any {
-  return new Promise((resolve, reject) => {
-    fs.writeFile(path, file, encoding || 'utf8', (error) => {
-      if (error) {
-        reject(error);
-      }
-      resolve(true);
-    });
-  });
-}
-
 export {
   escapeAssertion,
   removeComments,
@@ -92,6 +67,4 @@ export {
   arrayToString,
   paramsToString,
   setEquals,
-  readFile,
-  writeFile
 };

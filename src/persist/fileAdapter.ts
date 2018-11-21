@@ -1,7 +1,8 @@
 import { Adapter } from './adapter';
 import { Model } from '../model';
 import { Helper } from './helper';
-import { readFile, writeFile, arrayToString } from '../util';
+import { readFile, writeFile } from '../util/fs';
+import { arrayToString } from '../util';
 
 /**
  * FileAdapter is the file adapter for Casbin.
