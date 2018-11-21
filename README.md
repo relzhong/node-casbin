@@ -1,13 +1,12 @@
-node-Casbin
+simple-casbin
 ====
 [![NPM version][npm-image]][npm-url]
 [![NPM download][download-image]][download-url]
-[![codebeat badge](https://codebeat.co/badges/c17c9ee1-da42-4db3-8047-9574ad2b23b1)](https://codebeat.co/projects/github-com-casbin-node-casbin-master)
-[![Build Status](https://travis-ci.org/casbin/node-casbin.svg?branch=master)](https://travis-ci.org/casbin/node-casbin)
-[![Coverage Status](https://coveralls.io/repos/github/casbin/node-casbin/badge.svg?branch=master)](https://coveralls.io/github/casbin/node-casbin?branch=master)
-[![Release](https://img.shields.io/github/release/casbin/node-casbin.svg)](https://github.com/casbin/node-casbin/releases/latest)
+[![codebeat badge](https://codebeat.co/badges/c17c9ee1-da42-4db3-8047-9574ad2b23b1)](https://codebeat.co/projects/github-com-relzhong-simple-casbin-master)
+[![Build Status](https://travis-ci.org/casbin/node-casbin.svg?branch=master)](https://travis-ci.org/relzhong/simple-casbin)
+[![Coverage Status](https://coveralls.io/repos/github/casbin/node-casbin/badge.svg?branch=master)](https://coveralls.io/github/relzhong/simple-casbin?branch=master)
+[![Release](https://img.shields.io/github/release/casbin/node-casbin.svg)](https://github.com/relzhong/simple-casbin/releases/latest)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/casbin/lobby)
-[![Patreon](https://img.shields.io/badge/patreon-donate-yellow.svg)](http://www.patreon.com/yangluo)
 
 [npm-image]: https://img.shields.io/npm/v/casbin.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/casbin
@@ -18,7 +17,7 @@ node-Casbin
 
 ![casbin Logo](casbin-logo.png)
 
-node-Casbin is a powerful and efficient open-source access control library for Node.JS projects. It provides support for enforcing authorization based on various [access control models](https://en.wikipedia.org/wiki/Computer_security_model).
+simple-casbin is a powerful and efficient open-source access control library for NodeJS and Browser Envirorment. It provides support for enforcing authorization based on various [access control models](https://en.wikipedia.org/wiki/Computer_security_model).
 
 ## All the languages supported by Casbin:
 
@@ -30,15 +29,17 @@ production-ready | production-ready | production-ready | production-ready
 ## Installation
 
 ```
-npm install casbin --save
+npm install simple-casbin --save
 ```
 
 ## Get started
 
-1. Initialize a new node-Casbin enforcer with a model file and a policy file:
+1. Initialize a new simple-Casbin enforcer with a model file and a policy file:
 
     ```typescript
-    const enforcer = await Enforcer.newEnforcer('path/to/model.conf', 'path/to/policy.csv');
+    const enforcer = await new Enforcer(fs.readFileSync('model.conf', {encoding: 'utf-8'}), new FileAdapter(policyPath));
+    // or from a empty model
+    const enforcer = await new Enforcer(new Model(), new FileAdapter(policyPath));
     ```
     
     Note: you can also initialize an enforcer with policy in DB instead of file, see [Persistence](#policy-persistence) section for details.
@@ -162,8 +163,8 @@ https://casbin.org/docs/en/tutorials
 
 node-Casbin provides two sets of APIs to manage permissions:
 
-- [Management API](https://github.com/casbin/node-casbin/blob/master/src/main/java/org/casbin/node-casbin/main/ManagementEnforcer.java): the primitive API that provides full support for node-Casbin policy management. See [here](https://github.com/casbin/node-casbin/blob/master/src/test/java/org/casbin/node-casbin/main/ManagementAPIUnitTest.java) for examples.
-- [RBAC API](https://github.com/casbin/node-casbin/blob/master/src/main/java/org/casbin/node-casbin/main/Enforcer.java): a more friendly API for RBAC. This API is a subset of Management API. The RBAC users could use this API to simplify the code. See [here](https://github.com/casbin/node-casbin/blob/master/src/test/java/org/casbin/node-casbin/main/RbacAPIUnitTest.java) for examples.
+- Management API: the primitive API that provides full support for node-Casbin policy management.
+- RBAC API: a more friendly API for RBAC. This API is a subset of Management API. The RBAC users could use this API to simplify the code.
 
 We also provide a web-based UI for model management and policy management:
 

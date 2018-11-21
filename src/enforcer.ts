@@ -14,7 +14,7 @@
 
 import { ManagementEnforcer } from './managementEnforcer';
 import { FunctionMap, Model } from './model';
-import { Adapter, FileAdapter } from './persist';
+import { Adapter } from './persist';
 import { setEnableLog } from './util';
 
 /**
@@ -22,17 +22,21 @@ import { setEnableLog } from './util';
  */
 export class Enforcer extends ManagementEnforcer {
   /**
-   * newEnforcer creates an enforcer via file or DB.
+   * newEnforcer creates an enforcer via model define in text or Model instance And a policy Adapter.
    *
    * File:
    * ```js
-   * const e = new Enforcer('path/to/basic_model.conf', 'path/to/basic_policy.csv');
+   * const e = new Enforcer('model define', new FileAdapter(policyPath));
+   * ```
+   * or
+   * ```
+   * const e = new Enforcer(new Model(), new FileAdapter(policyPath));
    * ```
    *
    * MySQL DB:
    * ```js
    * const a = new MySQLAdapter('mysql', 'mysql_username:mysql_password@tcp(127.0.0.1:3306)/');
-   * const e = new Enforcer('path/to/basic_model.conf', a);
+   * const e = new Enforcer('model define', a);
    * ```
    *
    * @param params
@@ -51,11 +55,9 @@ export class Enforcer extends ManagementEnforcer {
 
     if (params.length - parsedParamLen === 2) {
       if (typeof params[0] === 'string') {
-        if (typeof params[1] === 'string') {
-          await e.initWithFile(params[0].toString(), params[1].toString());
-        } else {
-          await e.initWithAdapter(params[0].toString(), params[1]);
-        }
+        const m = new Model();
+        m.loadModelFromText(params[0]);
+        await e.initWithModelAndAdapter(m, params[1]);
       } else {
         if (typeof params[1] === 'string') {
           throw new Error('Invalid parameters for enforcer.');
@@ -65,13 +67,15 @@ export class Enforcer extends ManagementEnforcer {
       }
     } else if (params.length - parsedParamLen === 1) {
       if (typeof params[0] === 'string') {
-        await e.initWithFile(params[0], '');
+        const m = new Model();
+        m.loadModelFromText(params[0]);
+        await e.initWithModelAndAdapter(m);
       } else {
-        // @ts-ignore
-        await e.initWithModelAndAdapter(params[0], null);
+        await e.initWithModelAndAdapter(params[0]);
       }
     } else if (params.length === parsedParamLen) {
-      await e.initWithFile('', '');
+      const m = new Model();
+      await e.initWithModelAndAdapter(m);
     } else {
       throw new Error('Invalid parameters for enforcer.');
     }
@@ -79,33 +83,11 @@ export class Enforcer extends ManagementEnforcer {
   }
 
   /**
-   * initWithFile initializes an enforcer with a model file and a policy file.
-   * @param modelPath model file path
-   * @param policyPath policy file path
-   */
-  public async initWithFile(modelPath: string, policyPath: string): Promise<void> {
-    const a = new FileAdapter(policyPath);
-    await this.initWithAdapter(modelPath, a);
-  }
-
-  /**
-   * initWithAdapter initializes an enforcer with a database adapter.
-   * @param modelPath model file path
-   * @param adapter current adapter instance
-   */
-  public async initWithAdapter(modelPath: string, adapter: Adapter): Promise<void> {
-    const m = Enforcer.newModel(modelPath, '');
-    await this.initWithModelAndAdapter(m, adapter);
-
-    this.modelPath = modelPath;
-  }
-
-  /**
    * initWithModelAndAdapter initializes an enforcer with a model and a database adapter.
    * @param m model instance
    * @param adapter current adapter instance
    */
-  public async initWithModelAndAdapter(m: Model, adapter: Adapter): Promise<void> {
+  public async initWithModelAndAdapter(m: Model, adapter?: Adapter): Promise<void> {
     if (adapter) {
       this.adapter = adapter;
     }

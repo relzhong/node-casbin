@@ -54,32 +54,13 @@ export class CoreEnforcer {
   /**
    * newModel creates a model.
    */
-  public static newModel(...text: string[]): Model {
+  public static newModel(text?: string): Model {
     const m = new Model();
-
-    if (text.length === 2) {
-      if (text[0] !== '') {
-        m.loadModel(text[0]);
-      }
-    } else if (text.length === 1) {
-      m.loadModelFromText(text[0]);
-    } else if (text.length !== 0) {
-      throw new Error('Invalid parameters for model.');
+    if (text) {
+      m.loadModelFromText(text);
     }
 
     return m;
-  }
-
-  /**
-   * loadModel reloads the model from the model CONF file.
-   * Because the policy is attached to a model,
-   * so the policy is invalidated and needs to be reloaded by calling LoadPolicy().
-   */
-  public loadModel(): void {
-    this.model = CoreEnforcer.newModel();
-    this.model.loadModel(this.modelPath);
-    this.model.printModel();
-    this.fm = FunctionMap.loadFunctionMap();
   }
 
   /**

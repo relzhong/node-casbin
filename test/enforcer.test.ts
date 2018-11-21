@@ -15,6 +15,7 @@
 import { Enforcer } from '../src/enforcer';
 import { FileAdapter } from '../src/persist';
 import { Util } from '../src/casbin';
+import * as fs from 'fs';
 
 function testEnforce(e: Enforcer, sub: string, obj: string, act: string, res: boolean): void {
   expect(e.enforce(sub, obj, act)).toBe(res);
@@ -206,26 +207,26 @@ test('TestNotUsedRBACModelInMemory', async () => {
 });
 
 test('TestReloadPolicy', async () => {
-  const e = await Enforcer.newEnforcer('examples/rbac_model.conf', 'examples/rbac_policy.csv');
+  const e = await Enforcer.newEnforcer(fs.readFileSync('examples/rbac_model.conf', { encoding: 'utf-8' }), new FileAdapter('examples/rbac_policy.csv'));
 
   await e.loadPolicy();
   testGetPolicy(e, [['alice', 'data1', 'read'], ['bob', 'data2', 'write'], ['data2_admin', 'data2', 'read'], ['data2_admin', 'data2', 'write']]);
 });
 
 test('TestSavePolicy', async () => {
-  const e = await Enforcer.newEnforcer('examples/rbac_model.conf', 'examples/rbac_policy.csv');
+  const e = await Enforcer.newEnforcer(fs.readFileSync('examples/rbac_model.conf', { encoding: 'utf-8' }), new FileAdapter('examples/rbac_policy.csv'));
 
   await e.savePolicy();
 });
 
 test('TestClearPolicy', async () => {
-  const e = await Enforcer.newEnforcer('examples/rbac_model.conf', 'examples/rbac_policy.csv');
+  const e = await Enforcer.newEnforcer(fs.readFileSync('examples/rbac_model.conf', { encoding: 'utf-8' }), new FileAdapter('examples/rbac_policy.csv'));
 
   e.clearPolicy();
 });
 
 test('TestEnableEnforce', async () => {
-  const e = await Enforcer.newEnforcer('examples/basic_model.conf', 'examples/basic_policy.csv');
+  const e = await Enforcer.newEnforcer(fs.readFileSync('examples/basic_model.conf', { encoding: 'utf-8' }), new FileAdapter('examples/basic_policy.csv'));
 
   e.enableEnforce(false);
   testEnforce(e, 'alice', 'data1', 'read', true);
@@ -249,7 +250,7 @@ test('TestEnableEnforce', async () => {
 });
 
 test('TestEnableLog', async () => {
-  const e = await Enforcer.newEnforcer('examples/basic_model.conf', 'examples/basic_policy.csv', true);
+  const e = await Enforcer.newEnforcer(fs.readFileSync('examples/basic_model.conf', { encoding: 'utf-8' }), new FileAdapter('examples/basic_policy.csv'), true);
   // The log is enabled by default, so the above is the same with:
   // const e = await Enforcer.newEnforcer('examples/basic_model.conf', 'examples/basic_policy.csv');
 
@@ -275,7 +276,7 @@ test('TestEnableLog', async () => {
 });
 
 test('TestEnableAutoSave', async () => {
-  const e = await Enforcer.newEnforcer('examples/basic_model.conf', 'examples/basic_policy.csv');
+  const e = await Enforcer.newEnforcer(fs.readFileSync('examples/basic_model.conf', { encoding: 'utf-8' }), new FileAdapter('examples/basic_policy.csv'));
 
   e.enableAutoSave(false);
   // Because AutoSave is disabled, the policy change only affects the policy in Casbin enforcer,
@@ -313,7 +314,7 @@ test('TestEnableAutoSave', async () => {
 
 test('TestInitWithAdapter', async () => {
   const adapter = new FileAdapter('examples/basic_policy.csv');
-  const e = await Enforcer.newEnforcer('examples/basic_model.conf', adapter);
+  const e = await Enforcer.newEnforcer(fs.readFileSync('examples/basic_model.conf', { encoding: 'utf-8' }), adapter);
 
   testEnforce(e, 'alice', 'data1', 'read', true);
   testEnforce(e, 'alice', 'data1', 'write', false);
@@ -326,15 +327,15 @@ test('TestInitWithAdapter', async () => {
 });
 
 test('TestRoleLinks', async () => {
-  const e = await Enforcer.newEnforcer('examples/rbac_model.conf');
+  const e = await Enforcer.newEnforcer(fs.readFileSync('examples/rbac_model.conf', { encoding: 'utf-8' }));
   e.enableAutoBuildRoleLinks(false);
   e.buildRoleLinks();
   e.enforce('user501', 'data9', 'read');
 });
 
 test('TestGetAndSetModel', async () => {
-  const e = await Enforcer.newEnforcer('examples/basic_model.conf', 'examples/basic_policy.csv');
-  const e2 = await Enforcer.newEnforcer('examples/basic_with_root_model.conf', 'examples/basic_policy.csv');
+  const e = await Enforcer.newEnforcer(fs.readFileSync('examples/basic_model.conf', { encoding: 'utf-8' }), new FileAdapter('examples/basic_policy.csv'));
+  const e2 = await Enforcer.newEnforcer(fs.readFileSync('examples/basic_with_root_model.conf', { encoding: 'utf-8' }), new FileAdapter('examples/basic_policy.csv'));
 
   testEnforce(e, 'root', 'data1', 'read', false);
 
@@ -344,8 +345,8 @@ test('TestGetAndSetModel', async () => {
 });
 
 test('TestGetAndSetAdapterInMem', async () => {
-  const e = await Enforcer.newEnforcer('examples/basic_model.conf', 'examples/basic_policy.csv');
-  const e2 = await Enforcer.newEnforcer('examples/basic_model.conf', 'examples/basic_inverse_policy.csv');
+  const e = await Enforcer.newEnforcer(fs.readFileSync('examples/basic_model.conf', { encoding: 'utf-8' }), new FileAdapter('examples/basic_policy.csv'));
+  const e2 = await Enforcer.newEnforcer(fs.readFileSync('examples/basic_model.conf', { encoding: 'utf-8' }), new FileAdapter('examples/basic_inverse_policy.csv'));
 
   testEnforce(e, 'alice', 'data1', 'read', true);
   testEnforce(e, 'alice', 'data1', 'write', false);
@@ -359,7 +360,7 @@ test('TestGetAndSetAdapterInMem', async () => {
 });
 
 test('TestSetAdapterFromFile', async () => {
-  const e = await Enforcer.newEnforcer('examples/basic_model.conf');
+  const e = await Enforcer.newEnforcer(fs.readFileSync('examples/basic_model.conf', { encoding: 'utf-8' }));
 
   testEnforce(e, 'alice', 'data1', 'read', false);
 

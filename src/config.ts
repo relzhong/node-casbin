@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import { readFileSync } from 'fs';
 
 export class Config {
   private static DEFAULT_SECTION = 'default';
@@ -22,18 +21,6 @@ export class Config {
 
   constructor() {
     this.data = new Map<string, Map<string, string>>();
-  }
-
-  /**
-   * newConfig create an empty configuration representation from file.
-   *
-   * @param confName the path of the model file.
-   * @return the constructor of Config.
-   */
-  public static newConfig(confName: string): Config {
-    const config = new Config();
-    config.parse(confName);
-    return config;
   }
 
   /**
@@ -67,11 +54,6 @@ export class Config {
     } else {
       return false;
     }
-  }
-
-  private parse(path: string): void {
-    const buf = readFileSync(path);
-    this.parseBuffer(buf);
   }
 
   private parseBuffer(buf: Buffer): void {

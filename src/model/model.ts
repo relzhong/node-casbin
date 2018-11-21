@@ -97,19 +97,6 @@ export class Model {
     return true;
   }
 
-  // loadModel loads the model from model CONF file.
-  public loadModel(path: string): void {
-    // console.log('loadModel: ', path);
-    const cfg = Config.newConfig(path);
-
-    this.loadSection(cfg, 'r');
-    this.loadSection(cfg, 'p');
-    this.loadSection(cfg, 'e');
-    this.loadSection(cfg, 'm');
-
-    this.loadSection(cfg, 'g');
-  }
-
   // loadModelFromText loads the model from the text.
   public loadModelFromText(text: string): void {
     const cfg = Config.newConfigFromText(text);

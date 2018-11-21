@@ -1,5 +1,5 @@
 {
-  "name": "casbin",
+  "name": "simple-casbin",
   "version": "1.1.5",
   "description": "An authorization library that supports access control models like ACL, RBAC, ABAC in Node.JS",
   "main": "lib/casbin.js",
@@ -33,12 +33,13 @@
   },
   "files": [
     "lib",
-    "examples"
+    "examples",
+    "src"
   ],
   "homepage": "http://casbin.org",
   "repository": {
     "type": "git",
-    "url": "https://github.com/casbin/node-casbin.git"
+    "url": "https://github.com/relzhong/node-casbin.git"
   },
   "licenses": [
     {
